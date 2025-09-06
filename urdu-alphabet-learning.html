@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urdu MCQ Quiz</title>
+<style>
+body {font-family:"Noto Nastaliq Urdu",Arial,sans-serif; background:#fdf6e3; margin:0; padding:0;}
+header {background:#2e8b57;color:white;text-align:center;padding:1rem;font-size:2rem;}
+.container {padding:2rem; max-width:700px; margin:auto;}
+h2 {color:#2e8b57;margin-bottom:1rem;}
+.options {display:flex; flex-direction:column; gap:1rem; margin-top:1rem;}
+.option {padding:1rem; background:#e0f7fa; border-radius:8px; cursor:pointer; font-size:1.3rem; transition:0.2s;}
+.option.correct {background:#8bc34a; color:white;}
+.option.wrong {background:#c62828; color:white;}
+.option:hover {transform:scale(1.05);}
+button {margin-top:1.5rem;padding:0.7rem 1.5rem; background:#2e8b57; color:white; border:none; border-radius:8px; cursor:pointer;}
+button:hover {background:#246b45;}
+.feedback {margin-top:1rem; font-weight:bold;}
+</style>
+</head>
+<body>
+<header>Urdu Learning MCQ Quiz</header>
+<main class="container">
+<h2 id="question-text"></h2>
+<div class="options" id="options-container"></div>
+<p class="feedback" id="feedback"></p>
+<button id="next-btn">Next</button>
+<p id="score-text"></p>
+</main>
+
+<script>
+// ---------------- Quiz Data ----------------
+const quizQuestions = [
+{question:"What is the name of 'ن'?", type:"alphabet", options:["Noon","Meem","Laam","Ray"], answer:"Noon"},
+{question:"What is the name of 'چ'?", type:"alphabet", options:["Chay","Jeem","Khay","Ray"], answer:"Chay"},
+{question:"What is the name of 'ق'?", type:"alphabet", options:["Qaf","Kaf","Gaf","Khaf"], answer:"Qaf"},
+{question:"What is the name of 'س'?", type:"alphabet", options:["Seen","Sheen","Say","Sayy"], answer:"Seen"},
+{question:"What is the name of 'ڑ'?", type:"alphabet", options:["Rray","Ray","Zay","Dal"], answer:"Rray"},
+{question:"What is the name of 'ا'?", type:"alphabet", options:["Alif","Hamza","Ain","Hay"], answer:"Alif"},
+{question:"What is the name of 'ٹ'?", type:"alphabet", options:["Ttay","Tay","Dal","Ddal"], answer:"Ttay"},
+{question:"What is the name of 'ج'?", type:"alphabet", options:["Jeem","Chay","Ray","Zay"], answer:"Jeem"},
+{question:"What is the name of 'ح'?", type:"alphabet", options:["Hay","Khay","Jeem","Say"], answer:"Hay"},
+{question:"What is the name of 'ل'?", type:"alphabet", options:["Laam","Noon","Ray","Meem"], answer:"Laam"},
+{question:"What is the name of 'ذ'?", type:"alphabet", options:["Zal","Zay","Ray","Dal"], answer:"Zal"},
+{question:"What is the name of 'غ'?", type:"alphabet", options:["Ghayn","Ain","Gaf","Qaf"], answer:"Ghayn"},
+{question:"What is the name of 'ه'?", type:"alphabet", options:["Hay","Heh","Khay","Hamza"], answer:"Hay"},
+{question:"What is the name of 'ش'?", type:"alphabet", options:["Sheen","Seen","Say","Zay"], answer:"Sheen"},
+{question:"What is the name of 'ف'?", type:"alphabet", options:["Fay","Pay","Bay","Qaf"], answer:"Fay"},
+{question:"What is the name of 'ط'?", type:"alphabet", options:["Toy","Toay","Tay","Dal"], answer:"Toy"},
+{question:"What is the name of 'ہ'?", type:"alphabet", options:["Hay","Khay","Jeem","Hamza"], answer:"Hay"},
+{question:"What is the name of 'پ'?", type:"alphabet", options:["Pay","Bay","Tay","Jeem"], answer:"Pay"},
+{question:"What is the name of 'ر'?", type:"alphabet", options:["Ray","Zay","Dal","Jeem"], answer:"Ray"},
+{question:"What is the name of 'ض'?", type:"alphabet", options:["Zwad","Swad","Zay","Zal"], answer:"Zwad"},
+{question:"What is the name of 'ی'?", type:"alphabet", options:["Yaa","Wao","Hamza","Alif"], answer:"Yaa"},
+{question:"What is the name of 'ث'?", type:"alphabet", options:["Say","Seen","Sheen","Jeem"], answer:"Say"},
+{question:"What is the name of 'ڈ'?", type:"alphabet", options:["Ddal","Dal","Ray","Ttay"], answer:"Ddal"},
+{question:"What is the name of 'ز'?", type:"alphabet", options:["Zay","Zal","Ray","Say"], answer:"Zay"},
+{question:"What is the name of 'م'?", type:"alphabet", options:["Meem","Noon","Laam","Ray"], answer:"Meem"},
+{question:"What is the name of 'ب'?", type:"alphabet", options:["Bay","Pay","Tay","Jeem"], answer:"Bay"},
+{question:"What is the name of 'ص'?", type:"alphabet", options:["Swad","Zwad","Saw","Say"], answer:"Swad"},
+{question:"What is the name of 'ژ'?", type:"alphabet", options:["Zhay","Zay","Zal","Ray"], answer:"Zhay"},
+{question:"What is the name of 'گ'?", type:"alphabet", options:["Gaf","Kaf","Qaf","Jeem"], answer:"Gaf"},
+{question:"What is the name of 'ء'?", type:"alphabet", options:["Hamza","Alif","Ain","Hay"], answer:"Hamza"},
+{question:"What is the name of 'ع'?", type:"alphabet", options:["Ain","Alif","Hamza","Hay"], answer:"Ain"},
+{question:"What is the name of 'ک'?", type:"alphabet", options:["Kaf","Qaf","Gaf","Chaf"], answer:"Kaf"},
+{question:"What is the name of 'ظ'?", type:"alphabet", options:["Zoay","Zwad","Zal","Zay"], answer:"Zoay"},
+{question:"What is the name of 'د'?", type:"alphabet", options:["Dal","Ray","Day","Tay"], answer:"Dal"},
+{question:"What is the name of 'خ'?", type:"alphabet", options:["Khay","Hay","Chay","Jeem"], answer:"Khay"},
+];
+
+let currentQuestion=0;
+let score=0;
+
+const questionText=document.getElementById('question-text');
+const optionsContainer=document.getElementById('options-container');
+const feedback=document.getElementById('feedback');
+const nextBtn=document.getElementById('next-btn');
+const scoreText=document.getElementById('score-text');
+
+function loadQuestion(){
+  feedback.textContent='';
+  optionsContainer.innerHTML='';
+  if(currentQuestion>=quizQuestions.length){
+    questionText.textContent="Quiz Completed!";
+    optionsContainer.innerHTML='';
+    scoreText.textContent="Your Score: "+score+" / "+quizQuestions.length;
+    nextBtn.style.display='none';
+    return;
+  }
+  const q=quizQuestions[currentQuestion];
+  questionText.textContent=q.question;
+  q.options.forEach(opt=>{
+    const div=document.createElement('div'); div.classList.add('option'); div.textContent=opt;
+    div.addEventListener('click',()=>{
+      if(div.classList.contains('selected')) return;
+      div.classList.add('selected');
+      if(opt===q.answer){div.classList.add('correct'); feedback.textContent="Correct!"; score++;}
+      else{div.classList.add('wrong'); feedback.textContent="Wrong! Correct answer: "+q.answer;}
+    });
+    optionsContainer.appendChild(div);
+  });
+}
+
+nextBtn.addEventListener('click',()=>{
+  currentQuestion++;
+  loadQuestion();
+});
+
+loadQuestion();
+</script>
+</body>
+</html>
